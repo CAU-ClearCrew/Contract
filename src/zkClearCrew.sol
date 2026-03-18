@@ -47,8 +47,8 @@ contract zkClearCrew {
         string calldata ipfsCid,
         bytes32 submittedRoot
     ) external {
+        require(isValidMerkleRoot(submittedRoot), "Invalid root");
         require(verifyProof(proof, submittedRoot), "Invalid proof");
-        require(isValidMerkleRoot(submittedRoot), "invalid root");
 
         emit WhistleblowSubmitted(msg.sender, ipfsCid, submittedRoot);
     }
