@@ -6,6 +6,8 @@ import {zkClearCrew} from "../src/zkClearCrew.sol";
 import {HonkVerifier} from "../src/Verifier.sol";
 
 contract ZkClearCrewProofTest is Test {
+    uint256 internal constant EXPECTED_PROOF_BYTES = 456 * 32;
+
     event WhistleblowSubmitted(
         address indexed whistleblower,
         string ipfsCid,
@@ -52,7 +54,18 @@ contract ZkClearCrewProofTest is Test {
     }
 
     function _proofFromEnv() internal view returns (bytes memory) {
-        return vm.envBytes("ZK_PROOF_BYTES");
+        bytes memory raw = vm.envBytes("ZK_PROOF_BYTES");
+
+        if (raw.length == EXPECTED_PROOF_BYTES) {
+            return raw;
+        }
+
+        require(
+            raw.length > EXPECTED_PROOF_BYTES,
+            "proof shorter than verifier expectation"
+        );
+
+        return _slice(raw, raw.length - EXPECTED_PROOF_BYTES, EXPECTED_PROOF_BYTES);
     }
 
     function _rootFromEnv() internal view returns (bytes32) {
@@ -65,5 +78,18 @@ contract ZkClearCrewProofTest is Test {
 
     function _nullifierHashFromEnv() internal view returns (bytes32) {
         return vm.envBytes32("ZK_NULLIFIER_HASH");
+    }
+
+    function _slice(
+        bytes memory data,
+        uint256 start,
+        uint256 len
+    ) internal pure returns (bytes memory out) {
+        require(start + len <= data.length, "slice out of bounds");
+
+        out = new bytes(len);
+        for (uint256 i = 0; i < len; i++) {
+            out[i] = data[start + i];
+        }
     }
 }
