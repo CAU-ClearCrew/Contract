@@ -26,9 +26,11 @@ contract ZkClearCrewProofTest is Test {
     function testVerifierDirect_WithProvidedProofAndRoot() public view {
         bytes memory proof = _proofFromEnv();
         bytes32 submittedRoot = _rootFromEnv();
+        bytes32 nullifierHash = _nullifierHashFromEnv();
 
-        bytes32[] memory publicInputs = new bytes32[](1);
+        bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = submittedRoot;
+        publicInputs[1] = nullifierHash;
 
         bool ok = verifier.verify(proof, publicInputs);
         assertTrue(ok, "verifier.verify returned false");
@@ -58,5 +60,9 @@ contract ZkClearCrewProofTest is Test {
 
     function _cidFromEnv() internal view returns (string memory) {
         return vm.envString("ZK_IPFS_CID");
+    }
+
+    function _nullifierHashFromEnv() internal view returns (bytes32) {
+        return vm.envBytes32("ZK_NULLIFIER_HASH");
     }
 }
