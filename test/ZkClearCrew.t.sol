@@ -25,7 +25,7 @@ contract ZkClearCrewProofTest is Test {
         app = new zkClearCrew(address(verifier), address(this));
     }
 
-    function testVerifierDirect_WithProvidedProofAndRoot() public view {
+    function testVerifierDirect_WithProvidedProofAndRoot() public {
         bytes memory proof = _proofFromEnv();
         bytes32 submittedRoot = _rootFromEnv();
         bytes32 nullifierHash = _nullifierHashFromEnv();
@@ -53,7 +53,7 @@ contract ZkClearCrewProofTest is Test {
         app.submitWhistleblow(proof, ipfsCid, submittedRoot, nullifierHash);
     }
 
-    function _proofFromEnv() internal view returns (bytes memory) {
+    function _proofFromEnv() internal returns (bytes memory) {
         bytes memory raw = vm.envBytes("ZK_PROOF_BYTES");
         emit log_named_uint("raw_proof_length", raw.length);
 
