@@ -55,6 +55,7 @@ contract ZkClearCrewProofTest is Test {
 
     function _proofFromEnv() internal view returns (bytes memory) {
         bytes memory raw = vm.envBytes("ZK_PROOF_BYTES");
+        emit log_named_uint("raw_proof_length", raw.length);
 
         if (raw.length == EXPECTED_PROOF_BYTES) {
             return raw;
