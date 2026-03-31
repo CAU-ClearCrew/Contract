@@ -39,6 +39,7 @@ contract ZkClearCrewProofTest is Test {
     function testSubmitWhistleblow_WithProvidedProofAndRoot() public {
         bytes memory proof = _proofFromEnv();
         bytes32 submittedRoot = _rootFromEnv();
+        bytes32 nullifierHash = _nullifierHashFromEnv();
         string memory ipfsCid = _cidFromEnv();
 
         app.updateRoot(submittedRoot);
@@ -47,7 +48,7 @@ contract ZkClearCrewProofTest is Test {
         emit WhistleblowSubmitted(TEST_USER, ipfsCid, submittedRoot);
 
         vm.prank(TEST_USER);
-        app.submitWhistleblow(proof, ipfsCid, submittedRoot);
+        app.submitWhistleblow(proof, ipfsCid, submittedRoot, nullifierHash);
     }
 
     function _proofFromEnv() internal view returns (bytes memory) {
