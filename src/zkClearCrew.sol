@@ -45,22 +45,27 @@ contract zkClearCrew {
     function submitWhistleblow(
         bytes calldata proof,
         string calldata ipfsCid,
-        bytes32 submittedRoot
+        bytes32 submittedRoot,
+        bytes32 nullifierHash
     ) external {
-        require(isValidMerkleRoot(submittedRoot), "Invalid root");
-        require(verifyProof(proof, submittedRoot), "Invalid proof");
+        require(isValidMerkleRoot(submittedRoot), "invalid root");
+        require(
+            verifyProof(proof, submittedRoot, nullifierHash),
+            "Invalid proof"
+        );
 
         emit WhistleblowSubmitted(msg.sender, ipfsCid, submittedRoot);
     }
 
-    // STARK 증명을 통해 실제 Merkle 트리의 사원인지 검증
     function verifyProof(
         bytes calldata proof,
-        bytes32 submittedRoot
+        bytes32 submittedRoot,
+        bytes32 nullifierHash
     ) internal view returns (bool) {
-        // submittedRoot를 public input으로 사용
-        bytes32[] memory publicInputs = new bytes32[](1);
+        bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = submittedRoot;
+        publicInputs[1] = nullifierHash;
+
         return IVerifier(verifier).verify(proof, publicInputs);
     }
 
