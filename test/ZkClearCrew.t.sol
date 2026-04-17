@@ -66,7 +66,12 @@ contract ZkClearCrewProofTest is Test {
             "proof shorter than verifier expectation"
         );
 
-        return _slice(raw, raw.length - EXPECTED_PROOF_BYTES, EXPECTED_PROOF_BYTES);
+        return
+            _slice(
+                raw,
+                raw.length - EXPECTED_PROOF_BYTES,
+                EXPECTED_PROOF_BYTES
+            );
     }
 
     function _rootFromEnv() internal view returns (bytes32) {
