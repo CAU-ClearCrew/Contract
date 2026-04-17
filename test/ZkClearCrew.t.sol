@@ -6,7 +6,7 @@ import {zkClearCrew} from "../src/zkClearCrew.sol";
 import {HonkVerifier} from "../src/Verifier.sol";
 
 contract ZkClearCrewProofTest is Test {
-    uint256 internal constant EXPECTED_PROOF_BYTES = 456 * 32;
+    uint256 internal constant EXPECTED_PROOF_BYTES = 508 * 32;
     uint256 internal constant PUBLIC_INPUT_BYTES = 2 * 32;
     string internal constant PROOF_PATH = "testdata/proof";
     string internal constant PUBLIC_INPUTS_PATH = "testdata/public_inputs";
