@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
 import {zkClearCrew} from "../src/zkClearCrew.sol";
-import {HonkVerifier} from "../src/verifier.sol";
+import {HonkVerifier} from "../src/Verifier.sol";
 
 contract ClearCrewDeploy is Script {
     zkClearCrew public zkClearCrewInstance;

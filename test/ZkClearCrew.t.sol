@@ -7,6 +7,10 @@ import {HonkVerifier} from "../src/Verifier.sol";
 
 contract ZkClearCrewProofTest is Test {
     uint256 internal constant EXPECTED_PROOF_BYTES = 456 * 32;
+    uint256 internal constant PUBLIC_INPUT_BYTES = 2 * 32;
+    string internal constant PROOF_PATH = "testdata/proof";
+    string internal constant PUBLIC_INPUTS_PATH = "testdata/public_inputs";
+    string internal constant TEST_IPFS_CID = "QmTestCid";
 
     event WhistleblowSubmitted(
         address indexed whistleblower,
@@ -26,9 +30,8 @@ contract ZkClearCrewProofTest is Test {
     }
 
     function testVerifierDirect_WithProvidedProofAndRoot() public {
-        bytes memory proof = _proofFromEnv();
-        bytes32 submittedRoot = _rootFromEnv();
-        bytes32 nullifierHash = _nullifierHashFromEnv();
+        bytes memory proof = _proofFromFile();
+        (bytes32 submittedRoot, bytes32 nullifierHash) = _publicInputsFromFile();
 
         bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = submittedRoot;
@@ -39,10 +42,9 @@ contract ZkClearCrewProofTest is Test {
     }
 
     function testSubmitWhistleblow_WithProvidedProofAndRoot() public {
-        bytes memory proof = _proofFromEnv();
-        bytes32 submittedRoot = _rootFromEnv();
-        bytes32 nullifierHash = _nullifierHashFromEnv();
-        string memory ipfsCid = _cidFromEnv();
+        bytes memory proof = _proofFromFile();
+        (bytes32 submittedRoot, bytes32 nullifierHash) = _publicInputsFromFile();
+        string memory ipfsCid = TEST_IPFS_CID;
 
         app.updateRoot(submittedRoot);
 
@@ -53,49 +55,28 @@ contract ZkClearCrewProofTest is Test {
         app.submitWhistleblow(proof, ipfsCid, submittedRoot, nullifierHash);
     }
 
-    function _proofFromEnv() internal returns (bytes memory) {
-        bytes memory raw = vm.envBytes("ZK_PROOF_BYTES");
+    function _proofFromFile() internal returns (bytes memory) {
+        bytes memory raw = vm.readFileBinary(PROOF_PATH);
         emit log_named_uint("raw_proof_length", raw.length);
 
-        if (raw.length == EXPECTED_PROOF_BYTES) {
-            return raw;
-        }
+        require(raw.length == EXPECTED_PROOF_BYTES, "unexpected proof length");
+        return raw;
+    }
 
+    function _publicInputsFromFile()
+        internal
+        view
+        returns (bytes32 submittedRoot, bytes32 nullifierHash)
+    {
+        bytes memory publicInputs = vm.readFileBinary(PUBLIC_INPUTS_PATH);
         require(
-            raw.length > EXPECTED_PROOF_BYTES,
-            "proof shorter than verifier expectation"
+            publicInputs.length == PUBLIC_INPUT_BYTES,
+            "unexpected public input length"
         );
 
-        return
-            _slice(
-                raw,
-                raw.length - EXPECTED_PROOF_BYTES,
-                EXPECTED_PROOF_BYTES
-            );
-    }
-
-    function _rootFromEnv() internal view returns (bytes32) {
-        return vm.envBytes32("ZK_SUBMITTED_ROOT");
-    }
-
-    function _cidFromEnv() internal view returns (string memory) {
-        return vm.envString("ZK_IPFS_CID");
-    }
-
-    function _nullifierHashFromEnv() internal view returns (bytes32) {
-        return vm.envBytes32("ZK_NULLIFIER_HASH");
-    }
-
-    function _slice(
-        bytes memory data,
-        uint256 start,
-        uint256 len
-    ) internal pure returns (bytes memory out) {
-        require(start + len <= data.length, "slice out of bounds");
-
-        out = new bytes(len);
-        for (uint256 i = 0; i < len; i++) {
-            out[i] = data[start + i];
+        assembly {
+            submittedRoot := mload(add(publicInputs, 0x20))
+            nullifierHash := mload(add(publicInputs, 0x40))
         }
     }
 }
