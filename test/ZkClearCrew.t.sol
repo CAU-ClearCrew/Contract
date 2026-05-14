@@ -14,8 +14,8 @@ contract ZkClearCrewProofTest is Test {
 
     event WhistleblowSubmitted(
         address indexed whistleblower,
-        string ipfsCid,
-        bytes32 submittedRoot
+        string indexed ipfsCid,
+        bytes32 indexed submittedRoot
     );
 
     address internal constant TEST_USER =
@@ -31,7 +31,10 @@ contract ZkClearCrewProofTest is Test {
 
     function testVerifierDirect_WithProvidedProofAndRoot() public {
         bytes memory proof = _proofFromFile();
-        (bytes32 submittedRoot, bytes32 nullifierHash) = _publicInputsFromFile();
+        (
+            bytes32 submittedRoot,
+            bytes32 nullifierHash
+        ) = _publicInputsFromFile();
 
         bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = submittedRoot;
@@ -43,7 +46,10 @@ contract ZkClearCrewProofTest is Test {
 
     function testSubmitWhistleblow_WithProvidedProofAndRoot() public {
         bytes memory proof = _proofFromFile();
-        (bytes32 submittedRoot, bytes32 nullifierHash) = _publicInputsFromFile();
+        (
+            bytes32 submittedRoot,
+            bytes32 nullifierHash
+        ) = _publicInputsFromFile();
         string memory ipfsCid = TEST_IPFS_CID;
 
         app.updateRoot(submittedRoot);
