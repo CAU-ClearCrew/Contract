@@ -23,8 +23,8 @@ contract zkClearCrew {
     // groupId를 이벤트로 띄워야하지않나?
     event WhistleblowSubmitted(
         address indexed whistleblower,
-        string ipfsCid,
-        bytes32 submittedRoot
+        bytes32 indexed submittedRoot,
+        string ipfsCid
     );
 
     // STARK Verifier contract address
@@ -54,7 +54,7 @@ contract zkClearCrew {
             "Invalid proof"
         );
 
-        emit WhistleblowSubmitted(msg.sender, ipfsCid, submittedRoot);
+        emit WhistleblowSubmitted(msg.sender, submittedRoot, ipfsCid);
     }
 
     function verifyProof(
